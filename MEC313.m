@@ -27,6 +27,24 @@ B = [-1/(2*w),0,1/(2*w),0,1/(2*w),0,-1/(2*w),0;
 H = 4;
 K = H * det(J) * transpose(B) * D * B
 
+k1 = K;
+v1 = [1,2,3,4,5,6,7,8]; % The position vectors
+k2 = K;
+v2 = [7,8,5,6,11,12,9,10];
+k3 = sym(zeros(12));
+for i = v1
+    for j= v1
+        k3(i,j) = k3(i,j) + k1(find(v1 == i),find(v1 ==j));
+    end
+end
+
+for i = v2
+    for j= v2
+        k3(i,j) = k3(i,j) + k2(find(v2 == i),find(v2 ==j));
+    end
+end
+k3
+
 % Once the symbolic calculation is done, we calculate the solution of the
 % displacement and strain distributions using two rectangular elements. 
 
@@ -125,7 +143,7 @@ ey = [0.0008,0.00058,0.00021,-0.00025,-0.00053,-0.00068];
 fig1=figure();
 plot(Ex,Y,'b--s',ex,Y,'r*');
 hold on;
-ylabel('Y coordinate (mm)');
+ylabel('Y coordinate (m)');
 xlabel('\epsilon_x_x strain');
 legend('Hand Calculation','DIC');
 grid on;
@@ -137,7 +155,7 @@ saveas(fig1,'Image1','png');
 fig2=figure();
 plot(Ey,Y,'b--s',ey,Y,'r*');
 hold on;
-ylabel('Y coordinate (mm)');
+ylabel('Y coordinate (m)');
 xlabel('\epsilon_y_y strain');
 legend('Hand Calculation','DIC','location','southeast');
 grid on;
@@ -160,7 +178,7 @@ fig3=figure();
 plot(Ex_ansys_linear,Y,'bo');
 hold on;
 plot(Ex_ansys_quad,Y,'gd',ex,Y,'r*');
-ylabel('Y coordinate (mm)');
+ylabel('Y coordinate (m)');
 xlabel('\epsilon_x_x strain');
 legend('Linear Interp.','Quad. Interp.','DIC','location','northeast');
 grid on;
@@ -173,7 +191,7 @@ fig4=figure();
 plot(Ey_ansys_linear,Y,'bo')
 hold on;
 plot(Ey_ansys_quad,Y,'gd',ey,Y,'r*');
-ylabel('Y coordinate (mm)');
+ylabel('Y coordinate (m)');
 xlabel('\epsilon_y_y strain');
 legend('Linear Interp.','Quad. Interp.','DIC','location','southeast');
 grid on;
@@ -190,7 +208,7 @@ plot(Ex,Y,'ks');
 hold on;
 plot(Ex_ansys_linear,Y,'bo');
 plot(Ex_ansys_quad,Y,'gd',ex,Y,'r*');
-ylabel('Y coordinate (mm)');
+ylabel('Y coordinate (m)');
 xlabel('\epsilon_x_x strain');
 legend('Hand Calculation','Linear Interp.','Quad. Interp.','DIC','location','northeast');
 grid on;
@@ -204,7 +222,7 @@ plot(Ey,Y,'ks');
 hold on;
 plot(Ey_ansys_linear,Y,'bo')
 plot(Ey_ansys_quad,Y,'gd',ey,Y,'r*');
-ylabel('Y coordinate (mm)');
+ylabel('Y coordinate (m)');
 xlabel('\epsilon_y_y strain');
 legend('Hand Calculation','Linear Interp.','Quad. Interp.','DIC','location','southeast');
 grid on;
