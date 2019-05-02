@@ -61,7 +61,9 @@ B = [-1/(2*w),0,1/(2*w),0,1/(2*w),0,-1/(2*w),0;
     -1/(2*h),-1/(2*w),-1/(2*h),1/(2*w),1/(2*h),1/(2*w),1/(2*h),-1/(2*w)];
 H = 4;
 
-K = H * det(J) * transpose(B) * D * B;
+t = 0.02;
+
+K = t * H * det(J) * transpose(B) * D * B;
 
 % After calculating the stiffness matrix for one element, we obtain the
 % global stiffness matrix. 
