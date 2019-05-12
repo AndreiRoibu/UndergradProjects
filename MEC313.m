@@ -2,7 +2,7 @@
 % ------------------------------
 % Code written by Andrei Roibu
 % Created: 15/04/2019
-% Last Modified: 30/04/2019
+% Last Modified: 12/05/2019
 % ------------------------------
 % This script perfoms the relevant symbolic, numerical and statistical
 % calculations for the MEC313 Project 2
@@ -16,7 +16,7 @@ clear all;
 % matrix of a rectangular element with one Gauss point, we perform a
 % symbolic calculation and print the result. 
 
-syms w h E niu
+syms w h E niu t
 D = [1,niu,0;niu,1,0;0,0,(1-niu)/2];
 D = E/(1-niu^2)*D;
 J = [w/2,0;0,h/2];
@@ -25,7 +25,7 @@ B = [-1/(2*w),0,1/(2*w),0,1/(2*w),0,-1/(2*w),0;
     0,-1/(2*h),0,-1/(2*h),0,1/(2*h),0,1/(2*h);
     -1/(2*h),-1/(2*w),-1/(2*h),1/(2*w),1/(2*h),1/(2*w),1/(2*h),-1/(2*w)];
 H = 4;
-K = H * det(J) * transpose(B) * D * B
+K = t * H * det(J) * transpose(B) * D * B
 
 k1 = K;
 v1 = [1,2,3,4,5,6,7,8]; % The position vectors
@@ -60,9 +60,7 @@ B = [-1/(2*w),0,1/(2*w),0,1/(2*w),0,-1/(2*w),0;
     0,-1/(2*h),0,-1/(2*h),0,1/(2*h),0,1/(2*h);
     -1/(2*h),-1/(2*w),-1/(2*h),1/(2*w),1/(2*h),1/(2*w),1/(2*h),-1/(2*w)];
 H = 4;
-
 t = 0.02;
-
 K = t * H * det(J) * transpose(B) * D * B;
 
 % After calculating the stiffness matrix for one element, we obtain the
@@ -142,12 +140,25 @@ Ey = a1y + a2y*Y;
 ex = [-0.002, -0.0014, -0.0005, 0.0008, 0.0016, 0.002];
 ey = [0.0008,0.00058,0.00021,-0.00025,-0.00053,-0.00068];
 
+Y = [-34.35,-37.98,-41.60,-45.22,-48.85,-51.26];
+Y = abs((Y+34.35))/1000;
+
+Exx1234 = (1/w)*(1-Y(4:6)/h)*(u2-u1) + (Y(4:6)/(w*h))*(u3-u4);
+Exx4365 = (Y(1:3)/(w*h))*(u3-u4) + (1/w)*(Y(1:3)/h - 1)*(u6-u5);
+Exx = [rot90(rot90(Exx1234)),rot90(rot90(Exx4365))];
+
+X = 0:0.0000000001:w;
+Eyy = mean((1/h)*(1-X/w)*(v4-v1) + X/(w*h)*(v3-v2)); %1234
+Eyy2 = mean((1/h)*(1-X/w)*(v5-v4) + X/(w*h)*(v6-v3)); %4365
+
+Y = [-34.35,-37.98,-41.60,-45.22,-48.85,-51.26];
+
 fig1=figure();
-plot(Ex,Y,'b--s',ex,Y,'r*');
+plot(Ex,Y,'ks',Exx,Y,'md',ex,Y,'r*');
 hold on;
 ylabel('Y coordinate (m)');
 xlabel('\epsilon_x_x strain');
-legend('Hand Calculation','DIC');
+legend('Hand Calculation GP','Hand Calculation SF','DIC','location','northeast');
 grid on;
 grid minor;
 fig1.PaperUnits='centimeters';
@@ -155,7 +166,7 @@ fig1.PaperPosition=[0,0,14.8,7.4];
 saveas(fig1,'Image1','png');
 
 fig2=figure();
-plot(Ey,Y,'b--s',ey,Y,'r*');
+plot(Ey,Y,'ks',ey,Y,'r*');
 hold on;
 ylabel('Y coordinate (m)');
 xlabel('\epsilon_y_y strain');
@@ -165,7 +176,7 @@ grid minor;
 fig2.PaperUnits='centimeters';
 fig2.PaperPosition=[0,0,14.8,7.4];
 saveas(fig2,'Image2','png');
-
+% 
 % After obtaining the strain distributions using two rectangular elements
 % in ANSYS, the values are imputed and compared with the expermental data
 % using the graphical method.
@@ -208,11 +219,11 @@ saveas(fig4,'Image4','png');
 fig5=figure();
 plot(Ex,Y,'ks');
 hold on;
-plot(Ex_ansys_linear,Y,'bo');
+plot(Exx,Y,'md',Ex_ansys_linear,Y,'bo');
 plot(Ex_ansys_quad,Y,'gd',ex,Y,'r*');
 ylabel('Y coordinate (m)');
 xlabel('\epsilon_x_x strain');
-legend('Hand Calculation','Linear Interp.','Quad. Interp.','DIC','location','northeast');
+legend('Hand Calculation GP','Hand Calculation SF','Linear Interp.','Quad. Interp.','DIC','location','northeast');
 grid on;
 grid minor;
 fig5.PaperUnits='centimeters';
@@ -237,19 +248,21 @@ saveas(fig6,'Image6','png');
 L21mx = immse(ex,Ex);
 L22mx = immse(ex,Ex_ansys_linear);
 L23mx = immse(ex,Ex_ansys_quad);
+L24mx = immse(ex,Exx);
 L21my = immse(ey,Ey);
 L22my = immse(ey,Ey_ansys_linear);
 L23my = immse(ey,Ey_ansys_quad);
 
-L2mx = [L21mx;L22mx;L23mx]
+L2mx = [L21mx;L22mx;L23mx;L24mx]
 L2my = [L21my;L22my;L23my]
 
 L21sx = sum((ex - Ex).^2);
 L22sx = sum((ex - Ex_ansys_linear).^2);
 L23sx = sum((ex - Ex_ansys_quad).^2);
+L24sx = sum((ex - Exx).^2);
 L21sy = sum((ey - Ey).^2);
 L22sy = sum((ey - Ey_ansys_linear).^2);
 L23sy = sum((ey - Ey_ansys_quad).^2);
 
-L2sx = [L21sx;L22sx;L23sx]
+L2sx = [L21sx;L22sx;L23sx;L24sx]
 L2sy = [L21sy;L22sy;L23sy]
