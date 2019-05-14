@@ -2,7 +2,7 @@
 % ------------------------------
 % Code written by Andrei Roibu
 % Created: 15/04/2019
-% Last Modified: 12/05/2019
+% Last Modified: 14/05/2019
 % ------------------------------
 % This script perfoms the relevant symbolic, numerical and statistical
 % calculations for the MEC313 Project 2
@@ -141,13 +141,13 @@ ex = [-0.002, -0.0014, -0.0005, 0.0008, 0.0016, 0.002];
 ey = [0.0008,0.00058,0.00021,-0.00025,-0.00053,-0.00068];
 
 Y = [-34.35,-37.98,-41.60,-45.22,-48.85,-51.26];
-Y = abs((Y+34.35))/1000;
+Y = abs((Y+51.26))/1000; %normalising to 0 the origin coordinate (y= -51.26)
 
 Exx1234 = (1/w)*(1-Y(4:6)/h)*(u2-u1) + (Y(4:6)/(w*h))*(u3-u4);
 Exx4365 = (Y(1:3)/(w*h))*(u3-u4) + (1/w)*(Y(1:3)/h - 1)*(u6-u5);
-Exx = [rot90(rot90(Exx1234)),rot90(rot90(Exx4365))];
+Exx = [Exx4365,Exx1234];
 
-X = 0:0.0000000001:w;
+X = 0:3.4770e-06:w;
 Eyy = mean((1/h)*(1-X/w)*(v4-v1) + X/(w*h)*(v3-v2)); %1234
 Eyy2 = mean((1/h)*(1-X/w)*(v5-v4) + X/(w*h)*(v6-v3)); %4365
 
